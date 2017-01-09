@@ -12,6 +12,10 @@ script:
 - docker run --rm -ti -v $(pwd)/dist:/workdir kextract i386
 - docker run --rm -ti -v $(pwd)/dist:/workdir kextract powerpc
 - docker run --rm -ti -v $(pwd)/dist:/workdir kextract ppc64el
+before_deploy:
+- sudo chmod 755 ./dist
+- sudo chmod 644 ./dist/*
+- ls -al ./dist/
 deploy:
   provider: releases
   api_key:
