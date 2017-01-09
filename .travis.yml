@@ -15,6 +15,7 @@ script:
 before_deploy:
 - sudo chmod 755 ./dist
 - sudo chmod 644 ./dist/*
+- sudo chown -R travis:travis ./dist
 - ls -al ./dist/
 deploy:
   provider: releases
