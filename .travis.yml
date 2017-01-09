@@ -1,0 +1,25 @@
+sudo: required
+services:
+- docker
+language: bash
+install:
+- docker build -t kextract .
+- mkdir workdir
+script:
+- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract amd64
+- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract arm64
+- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract armel
+- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract armhf
+- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract i386
+- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract powerpc
+- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract ppc64el
+deploy:
+  provider: releases
+  api_key:
+    secure: tT5vs/hMarrQ0CZjV92GQPe+iXKngA6q9/k2cm/Cnc1LhVtsy4/vSV+ykLLYwkphevzVVSaHZm2aj6V+mtt8YbiH7mMXhp/+oMJJvDi1kdSFfgyCHhn9yIY7RarZKkejb7VL8zZ7dDkkl7Ww249CSex9dOpK10tuNgEP6f3zdDSzbzzmEtth03itEL/QeA9IyW03WthBMsN7802WX5TnHnS1FJQx/a744J3usi5o486Ol+1uQlFaSHU6556V6lrRH1Bln3zDrGjHsN+ZQN1CsEWyb22i6P3hdqwbA/r9d4FLXkke5xVvGMDZA+XXjkn3oNp8oh3XGV8OxOcx5dd/ZffX9AwMyn0BrWQEalUfR79NGUf7boIub/aBiHXqCuygYbWm4bFZ+FlX4cG66VyinB5mYGOe7d36PgVAblX7fLAwWpXLF9UY8cKBrM0W8/om77WATyqZnesb9cyEChtIiQMG1eIsZk7mnrw9g1NJG9R+Vt6FyRowVIW6JRWbwzduVdr5WBz9CsqiK4qPZ6CJEP1bc4RmQZvwd0nJU7qUEDwPS8kqlVp4Q68qki63S54KGpwdvKspOkpYFyqgrfD8EtTbX8ht/VE84R7xr9y0hySVBMS06heHhUyY50BxkT6iNRNzU9qD/6nrC6+3FkcBAk6ADzZqc7fzlw8PJSBfyek=
+  skip_cleanup: true
+  file_glob: true
+  file: "./workdir/{vmlinuz-*,modules-*.tar.gz}"
+  on:
+    repo: nlm/docker-kextract
+    tags: on
