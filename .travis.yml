@@ -8,7 +8,6 @@ install:
 script:
 - docker run --rm -ti -v $(pwd)/workdir:/workdir kextract amd64
 - docker run --rm -ti -v $(pwd)/workdir:/workdir kextract arm64
-- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract armel
 - docker run --rm -ti -v $(pwd)/workdir:/workdir kextract armhf
 - docker run --rm -ti -v $(pwd)/workdir:/workdir kextract i386
 - docker run --rm -ti -v $(pwd)/workdir:/workdir kextract powerpc

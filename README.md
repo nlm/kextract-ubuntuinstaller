@@ -27,7 +27,6 @@ Supported Architectures
 
 - amd64
 - arm64
-- armel
 - armhf
 - i386
 - powerpc
