@@ -19,7 +19,7 @@ How to Use
 
 ```
 mkdir ./workdir
-docker run --rm -ti -v $(pwd)/workdir:/workdir nlm/kextract ARCH
+docker run --rm -ti -v $(pwd)/workdir:/workdir nlimage/kextract ARCH
 ```
 
 Supported Architectures
