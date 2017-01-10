@@ -1,7 +1,7 @@
 #!/bin/sh -eu
 usage()
 {
-    echo "usage: $0 amd64|arm64|armel|armhf|i386|powerpc|ppc64el jessie|stretch"
+    echo "usage: $0 amd64|arm64|armel|armhf|i386|powerpc|ppc64el xenial"
 }
 
 if [ $# -ne 2 ]; then

@@ -3,22 +3,9 @@ services:
 - docker
 language: bash
 install:
-- docker build -t kextract .
 - mkdir dist
-# As building process using a travis vm instead of container is expensive,
-# use a list of build commands instead of a build matrix.
 script:
-- docker run --rm -ti -v $(pwd)/dist:/workdir kextract amd64 jessie
-- docker run --rm -ti -v $(pwd)/dist:/workdir kextract arm64 jessie
-- docker run --rm -ti -v $(pwd)/dist:/workdir kextract armhf jessie
-- docker run --rm -ti -v $(pwd)/dist:/workdir kextract i386 jessie
-- docker run --rm -ti -v $(pwd)/dist:/workdir kextract powerpc jessie
-- docker run --rm -ti -v $(pwd)/dist:/workdir kextract ppc64el jessie
-- docker run --rm -ti -v $(pwd)/dist:/workdir kextract amd64 stretch
-- docker run --rm -ti -v $(pwd)/dist:/workdir kextract arm64 stretch
-- docker run --rm -ti -v $(pwd)/dist:/workdir kextract armhf stretch
-- docker run --rm -ti -v $(pwd)/dist:/workdir kextract i386 stretch
-- docker run --rm -ti -v $(pwd)/dist:/workdir kextract ppc64el stretch
+- "./travis.sh"
 before_deploy:
 - sudo chmod 755 ./dist
 - sudo chmod 644 ./dist/*
@@ -27,10 +14,10 @@ before_deploy:
 deploy:
   provider: releases
   api_key:
-    secure: tT5vs/hMarrQ0CZjV92GQPe+iXKngA6q9/k2cm/Cnc1LhVtsy4/vSV+ykLLYwkphevzVVSaHZm2aj6V+mtt8YbiH7mMXhp/+oMJJvDi1kdSFfgyCHhn9yIY7RarZKkejb7VL8zZ7dDkkl7Ww249CSex9dOpK10tuNgEP6f3zdDSzbzzmEtth03itEL/QeA9IyW03WthBMsN7802WX5TnHnS1FJQx/a744J3usi5o486Ol+1uQlFaSHU6556V6lrRH1Bln3zDrGjHsN+ZQN1CsEWyb22i6P3hdqwbA/r9d4FLXkke5xVvGMDZA+XXjkn3oNp8oh3XGV8OxOcx5dd/ZffX9AwMyn0BrWQEalUfR79NGUf7boIub/aBiHXqCuygYbWm4bFZ+FlX4cG66VyinB5mYGOe7d36PgVAblX7fLAwWpXLF9UY8cKBrM0W8/om77WATyqZnesb9cyEChtIiQMG1eIsZk7mnrw9g1NJG9R+Vt6FyRowVIW6JRWbwzduVdr5WBz9CsqiK4qPZ6CJEP1bc4RmQZvwd0nJU7qUEDwPS8kqlVp4Q68qki63S54KGpwdvKspOkpYFyqgrfD8EtTbX8ht/VE84R7xr9y0hySVBMS06heHhUyY50BxkT6iNRNzU9qD/6nrC6+3FkcBAk6ADzZqc7fzlw8PJSBfyek=
+    secure: T/SUqY8DfnLgvKZUL3/8foRm0x2KDXhqpfr1MSjff17ngKBS/rW7O6BTZTY5wzGLbs/l8uBWqeOQRW0QsAj4EyAaJ4UGByCRETTDPICmE81WXK4pGuKN6UhNPakhqO7EMYxL9lFdDCeJEwioCqUKzzaR3JFNnZec+MMLelr+0K8ggqX3attBtgGxej1gKaA9EOjht16I4Jmbyz0BhaNVk03m0TQZg9EJY7S7k/8o1/OV3A3bW+4KReeSXGwJmPI78TFiu8El1puq/bFuWVpk4Z7eIzJ1lYenthL8r/7QCwzhlYd9pYiqDMJZyZi8w7vWRsVYsSsR0zbI9kUMib5vmEb7E56WLzNgWPb3i6CUF8Puu+btQhzTh/qBgmVEektNBz2r3WMwkP3xLSrfxhEwzYt/bxELH4uOlhjiyBDEsGMlErzs4OA/7WZOeSoCFGzCpyedX6ymv2Hb2/ccJJ3y2IfbF88E4udQZrzlH25O8yVceRa4EcNmgtbaUUszMP+gm4OmCHd4H+D9vmZiueW/NS+7e74TP7vx70nU13oKL97F0WhHZUxzzsltmkXl9yt17tfbyzJC1Se4B6fW+iG87Twi0MruRmWrS2tQQUdOBZv4zY6J2/4XHPvD1l5mKBGF0IXnmrW1fCOTco80rqVgDoToQdAHqqkMaYfjwvvhRvI=
   skip_cleanup: true
   file_glob: true
   file: "./dist/*"
   on:
-    repo: nlm/kextract-debianinstaller
+    repo: nlm/kextract-ubuntuinstaller
     tags: on
