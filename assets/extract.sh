@@ -1,6 +1,5 @@
 #!/bin/sh -eu
 DEBIAN_MIRROR=${DEBIAN_MIRROR:-"http://ftp.free.fr/mirrors/ftp.debian.org"}
-DEBIAN_DIST=${DEBIAN_DIST:-jessie}
 
 echo_info()
 {
@@ -9,29 +8,30 @@ echo_info()
 
 usage()
 {
-    echo "usage: $0 ARCH"
+    echo "usage: $0 ARCH DIST"
 }
 
-ARCH="$1"
+DEBIAN_ARCH="${1}"
+DEBIAN_DIST="${2}"
 
-case $ARCH in
+case $DEBIAN_ARCH in
     amd64|arm64|i386)
-        DEBIAN_SOURCE="${DEBIAN_MIRROR}/dists/${DEBIAN_DIST}/main/installer-${ARCH}/current/images/netboot/debian-installer/${ARCH}/"
+        DEBIAN_SOURCE="${DEBIAN_MIRROR}/dists/${DEBIAN_DIST}/main/installer-${DEBIAN_ARCH}/current/images/netboot/debian-installer/${DEBIAN_ARCH}/"
         LINUX="linux"
         INITRD="initrd.gz"
         ;;
     armhf)
-        DEBIAN_SOURCE="${DEBIAN_MIRROR}/dists/${DEBIAN_DIST}/main/installer-${ARCH}/current/images/netboot/"
+        DEBIAN_SOURCE="${DEBIAN_MIRROR}/dists/${DEBIAN_DIST}/main/installer-${DEBIAN_ARCH}/current/images/netboot/"
         LINUX="vmlinuz"
         INITRD="initrd.gz"
         ;;
     powerpc)
-        DEBIAN_SOURCE="${DEBIAN_MIRROR}/dists/${DEBIAN_DIST}/main/installer-${ARCH}/current/images/${ARCH}/netboot/"
+        DEBIAN_SOURCE="${DEBIAN_MIRROR}/dists/${DEBIAN_DIST}/main/installer-${DEBIAN_ARCH}/current/images/${DEBIAN_ARCH}/netboot/"
         LINUX="vmlinux"
         INITRD="initrd.gz"
         ;;
     ppc64el)
-        DEBIAN_SOURCE="${DEBIAN_MIRROR}/dists/${DEBIAN_DIST}/main/installer-${ARCH}/current/images/netboot/debian-installer/${ARCH}/"
+        DEBIAN_SOURCE="${DEBIAN_MIRROR}/dists/${DEBIAN_DIST}/main/installer-${DEBIAN_ARCH}/current/images/netboot/debian-installer/${DEBIAN_ARCH}/"
         LINUX="vmlinux"
         INITRD="initrd.gz"
         ;;
@@ -44,16 +44,18 @@ esac
 
 echo_info "mirror=$DEBIAN_MIRROR"
 echo_info "path=$DEBIAN_SOURCE"
-echo_info "arch=$ARCH"
+echo_info "arch=$DEBIAN_ARCH"
+echo_info "dist=$DEBIAN_DIST"
 
 echo_info "downloading linux image..."
-wget -q $DEBIAN_SOURCE/$LINUX -O vmlinuz-${ARCH}
+wget -q $DEBIAN_SOURCE/$LINUX -O vmlinuz-${DEBIAN_DIST}-${DEBIAN_ARCH}
 echo_info "downloading initrd..."
 wget -q ${DEBIAN_SOURCE}/$INITRD -O initrd.gz
 echo_info "extracting modules from initrd..."
 gunzip < initrd.gz | cpio -id 'lib/modules/*'
 echo_info "archiving modules..."
-tar -C lib/modules -zcf modules-${ARCH}.tar.gz .
+echo_info "detected kernel version: $(ls -1 lib/modules)"
+tar -C lib/modules -zcf modules-${DEBIAN_DIST}-${DEBIAN_ARCH}.tar.gz .
 echo_info "cleaning..."
 rm -rf initrd.gz lib
 echo_info "finished"

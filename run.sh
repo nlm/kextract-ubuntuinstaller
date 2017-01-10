@@ -1,18 +1,19 @@
 #!/bin/sh -eu
-DOCKERIMAGE=${KEXTRACT:-kextract}
-WORKDIR=${KEXTRACT_WORKDIR:-$(pwd)/workdir}
-ARCH=${1:-${KEXTRACT_ARCH:-amd64}}
-
 usage()
 {
-    echo "usage: $0 amd64|arm64|armel|armhf|i386|powerpc|ppc64el"
+    echo "usage: $0 amd64|arm64|armel|armhf|i386|powerpc|ppc64el jessie|stretch"
 }
 
-if [ $# -ne 1 ]; then
+if [ $# -ne 2 ]; then
     usage
     exit 1
 fi
 
-docker build -t ${DOCKERIMAGE} .
-[ ! -d $WORKDIR ] && mkdir -p ${WORKDIR}
-docker run --rm -ti -v ${WORKDIR}:/workdir ${DOCKERIMAGE} ${ARCH}
+ARCH="${1}"
+DIST="${2}"
+
+DOCKERIMAGE="${KEXTRACT_DOCKERIMAGE:-kextract}"
+WORKDIR="${KEXTRACT_WORKDIR:-$(pwd)/workdir}"
+
+docker build -t "${DOCKERIMAGE}" .
+docker run --rm -ti -v "${WORKDIR}:/workdir" "${DOCKERIMAGE}" "${ARCH}" "${DIST}"

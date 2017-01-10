@@ -12,14 +12,14 @@ How to Use
 ### Simple mode
 
 ```
-./run.sh
+./run.sh ARCH DIST
 ```
 
 ### Manual mode
 
 ```
 mkdir ./workdir
-docker run --rm -ti -v $(pwd)/workdir:/workdir nlimage/kextract ARCH
+docker run --rm -ti -v $(pwd)/workdir:/workdir nlimage/kextract ARCH DIST
 ```
 
 Supported Architectures
@@ -32,3 +32,10 @@ Supported Architectures
 - powerpc
 - ppc64el
 
+Supported Distributions
+-----------------------
+
+- jessie
+- stretch
+
+Other distributions may work but are untested
