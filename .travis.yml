@@ -5,16 +5,20 @@ language: bash
 install:
 - docker build -t kextract .
 - mkdir workdir
-env:
-- DEBIAN_DIST=jessie
-- DEBIAN_DIST=stretch
+# As building process using a travis vm instead of container is expensive,
+# use a list of build commands instead of a build matrix.
 script:
-- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract amd64 $DEBIAN_DIST
-- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract arm64 $DEBIAN_DIST
-- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract armhf $DEBIAN_DIST
-- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract i386 $DEBIAN_DIST
-- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract powerpc $DEBIAN_DIST
-- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract ppc64el $DEBIAN_DIST
+- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract amd64 jessie
+- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract arm64 jessie
+- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract armhf jessie
+- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract i386 jessie
+- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract powerpc jessie
+- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract ppc64el jessie
+- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract amd64 stretch
+- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract arm64 stretch
+- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract armhf stretch
+- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract i386 stretch
+- docker run --rm -ti -v $(pwd)/workdir:/workdir kextract ppc64el stretch
 deploy:
   provider: releases
   api_key:
