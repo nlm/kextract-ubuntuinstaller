@@ -103,10 +103,14 @@ for path in $(cat "${TMP_PKG_INDEX}" | grep '^[a-z][a-z]*-modules-[^ ]*-di ' | c
     echo_subinfo "extracting ${pkg_file}..."
     dpkg --extract "${pkg_file}" "${TMP_MOD_DIR}"
 done
-echo_info "detected extra modules kernel version: $(ls -1 ${TMP_MOD_DIR}/lib/modules)"
-echo_info "archiving extra modules..."
-tar -C "${TMP_MOD_DIR}/lib/modules" -zcf "modules-extra-${UBUNTU_DIST}-${UBUNTU_ARCH}.tar.gz" .
-echo_info "detected firmwares kernel version: $(ls -1 ${TMP_MOD_DIR}/lib/firmware)"
-echo_info "archiving firmwares..."
-tar -C "${TMP_MOD_DIR}/lib/firmware" -zcf "firmware-${UBUNTU_DIST}-${UBUNTU_ARCH}.tar.gz" .
+if [ -e "${TMP_MOD_DIR}/lib/modules" ]; then
+    echo_info "detected extra modules kernel version: $(ls ${TMP_MOD_DIR}/lib/modules)"
+    echo_info "archiving extra modules..."
+    tar -C "${TMP_MOD_DIR}/lib/modules" -zcf "modules-extra-${UBUNTU_DIST}-${UBUNTU_ARCH}.tar.gz" .
+fi
+if [ -e "${TMP_MOD_DIR}/lib/firmware" ]; then
+    echo_info "detected firmwares kernel version: $(ls ${TMP_MOD_DIR}/lib/firmware)"
+    echo_info "archiving firmwares..."
+    tar -C "${TMP_MOD_DIR}/lib/firmware" -zcf "firmware-${UBUNTU_DIST}-${UBUNTU_ARCH}.tar.gz" .
+fi
 echo_info "finished"
