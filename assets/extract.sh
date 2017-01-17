@@ -81,7 +81,8 @@ wget -q "${UBUNTU_INSTALLER}/$INITRD" -O "initrd.gz"
 echo_info "extracting modules from initrd..."
 gunzip < "initrd.gz" | cpio -id 'lib/modules/*'
 echo_info "archiving modules..."
-echo_info "detected kernel version: $(ls -1 lib/modules)"
+kernel_version=$(ls -1 lib/modules | head -n 1)
+echo_info "detected kernel version: ${kernel_version}"
 tar -C "lib/modules" -zcf "modules-${UBUNTU_DIST}-${UBUNTU_ARCH}.tar.gz" .
 echo_info "cleaning..."
 rm -rf "initrd.gz" "lib"
@@ -95,7 +96,7 @@ echo_info "downloading installer package index..."
 wget -q -O - "${UBUNTU_PKGIDX}" \
     | gunzip | grep '^\(Package:\|Filename:\)' | cut -d':' -f 2 | xargs -n 2 echo > "${TMP_PKG_INDEX}"
 echo_info "downloading extra packages..."
-for path in $(cat "${TMP_PKG_INDEX}" | grep '^[a-z][a-z]*-modules-[^ ]*-di ' | cut -d' ' -f2); do
+for path in $(cat "${TMP_PKG_INDEX}" | grep '^[a-z][a-z]*-modules-'"${kernel_version}"'-di ' | cut -d' ' -f2); do
     pkg_url="${UBUNTU_REPO}/${path}"
     pkg_file="${TMP_PKG_DIR}/$(basename ${path})"
     echo_subinfo "downloading ${pkg_url}..."
