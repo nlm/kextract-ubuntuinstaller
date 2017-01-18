@@ -68,11 +68,14 @@ case $UBUNTU_ARCH in
         ;;
 esac
 
+COMPRESSOR="xz -f -9"
+
 echo_info "repo=$UBUNTU_REPO"
 echo_info "installer=$UBUNTU_INSTALLER"
 echo_info "pkgidx=$UBUNTU_PKGIDX"
 echo_info "arch=$UBUNTU_ARCH"
 echo_info "dist=$UBUNTU_DIST"
+echo_info "compressor=$COMPRESSOR"
 
 echo_info "downloading linux image..."
 wget -q "${UBUNTU_INSTALLER}/$LINUX" -O "vmlinuz-${UBUNTU_DIST}-${UBUNTU_ARCH}"
@@ -80,10 +83,12 @@ echo_info "downloading initrd..."
 wget -q "${UBUNTU_INSTALLER}/$INITRD" -O "initrd.gz"
 echo_info "extracting modules from initrd..."
 gunzip < "initrd.gz" | cpio -id 'lib/modules/*'
-echo_info "archiving modules..."
+echo_info "archiving base modules..."
 kernel_version=$(ls -1 lib/modules | head -n 1)
 echo_info "detected kernel version: ${kernel_version}"
-tar -C "lib/modules" -zcf "modules-${UBUNTU_DIST}-${UBUNTU_ARCH}.tar.gz" .
+tar -C "lib/modules" -cf "modules-base-${UBUNTU_DIST}-${UBUNTU_ARCH}.tar" .
+echo_info "compressing archive..."
+$COMPRESSOR "modules-base-${UBUNTU_DIST}-${UBUNTU_ARCH}.tar"
 echo_info "cleaning..."
 rm -rf "initrd.gz" "lib"
 
@@ -99,19 +104,30 @@ echo_info "downloading extra packages..."
 for path in $(cat "${TMP_PKG_INDEX}" | grep '^[a-z][a-z]*-modules-'"${kernel_version}"'-di ' | cut -d' ' -f2); do
     pkg_url="${UBUNTU_REPO}/${path}"
     pkg_file="${TMP_PKG_DIR}/$(basename ${path})"
+    pkg_name="$(basename $path | cut -d'-' -f 1)"
+    pkg_dir="${TMP_MOD_DIR}/${pkg_file}"
     echo_subinfo "downloading ${pkg_url}..."
     wget -q "${pkg_url}" -O "${pkg_file}"
     echo_subinfo "extracting ${pkg_file}..."
-    dpkg --extract "${pkg_file}" "${TMP_MOD_DIR}"
+    mkdir -p "${pkg_dir}"
+    dpkg --extract "${pkg_file}" "${pkg_dir}"
+    for asset_type in modules firmware; do
+        if [ -e "${pkg_dir}/lib/${asset_type}" ]; then
+            echo_info "${pkg_name} ${asset_type} kernel version: $(ls ${pkg_dir}/lib/${asset_type})"
+            echo_info "archiving ${pkg_name} ${asset_type}..."
+            tar -C "${pkg_dir}/lib/${asset_type}" -cf "${asset_type}-${pkg_name}-${UBUNTU_DIST}-${UBUNTU_ARCH}.tar" .
+            echo_info "compressing archive..."
+            $COMPRESSOR "${asset_type}-${pkg_name}-${UBUNTU_DIST}-${UBUNTU_ARCH}.tar"
+        fi
+#    if [ -e "${pkg_dir}/lib/firmware" ]; then
+#        echo_info "firmwares kernel version: $(ls ${pkg_dir}/lib/firmware)"
+#        echo_info "archiving $pkg_name firmwares..."
+#        tar -C "${pkg_dir}/lib/firmware" -cf "firmware-${pkg_name}-${UBUNTU_DIST}-${UBUNTU_ARCH}.tar" .
+#        echo_info "compressing archive..."
+#        $COMPRESSOR "firmware-${pkg_name}-${UBUNTU_DIST}-${UBUNTU_ARCH}.tar"
+#    fi
+        echo_subinfo "cleaning..."
+        rm -rf "${pkg_dir}"
+    done
 done
-if [ -e "${TMP_MOD_DIR}/lib/modules" ]; then
-    echo_info "detected extra modules kernel version: $(ls ${TMP_MOD_DIR}/lib/modules)"
-    echo_info "archiving extra modules..."
-    tar -C "${TMP_MOD_DIR}/lib/modules" -zcf "modules-extra-${UBUNTU_DIST}-${UBUNTU_ARCH}.tar.gz" .
-fi
-if [ -e "${TMP_MOD_DIR}/lib/firmware" ]; then
-    echo_info "detected firmwares kernel version: $(ls ${TMP_MOD_DIR}/lib/firmware)"
-    echo_info "archiving firmwares..."
-    tar -C "${TMP_MOD_DIR}/lib/firmware" -zcf "firmware-${UBUNTU_DIST}-${UBUNTU_ARCH}.tar.gz" .
-fi
 echo_info "finished"
