@@ -126,8 +126,8 @@ for path in $(cat "${TMP_PKG_INDEX}" | grep '^[a-z][a-z]*-modules-'"${kernel_ver
 #        echo_info "compressing archive..."
 #        $COMPRESSOR "firmware-${pkg_name}-${UBUNTU_DIST}-${UBUNTU_ARCH}.tar"
 #    fi
-        echo_subinfo "cleaning..."
-        rm -rf "${pkg_dir}"
     done
+    echo_subinfo "cleaning..."
+    rm -rf "${pkg_dir}"
 done
 echo_info "finished"
